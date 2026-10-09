@@ -355,7 +355,7 @@ const IMG={hero:U.hero,combo:U.plato,p_kemp:U.kebab,p_comp:U.plato,p_duo:U.durum
 const img=(k,w=640,h=480)=>IMG[k]?`https://images.unsplash.com/${IMG[k]}?w=${w}&h=${h}&fit=crop&auto=format&q=72`:'';
 const EMO_CAT={'Promos online':'🥙',Prime:'🌯',Clásicos:'🥙',Combos:'🍟','Pides turcas':'🫓',Tostados:'🥪',Deli:'🍪',Bebidas:'🥤'};
 const emo=k=>{const p=S.productos.find(x=>x.id===k);return p?EMO_CAT[p.cat]||'🍽️':'🥙'};
-const ph=(k,cls='',w,h)=>`<div class="ph ${cls}" data-emo="${emo(k)}"><img src="${img(k,w,h)}" alt="" onload="this.classList.add('ld')" onerror="this.parentNode.classList.add('noimg')">`;
+const ph=(k,cls='',w,h)=>`<div class="ph ${cls}${IMG[k]?'':' noimg'}" data-emo="${emo(k)}"><img src="${img(k,w,h)}" alt="" onload="this.classList.add('ld')" onerror="this.parentNode.classList.add('noimg')">`;
 // opciones por producto: req = elegir 1 obligatorio; multi = opcionales. [nombre, recargo]
 const G_SALSA={t:'Salsa (va adentro)',req:1,ops:['Ajo','Yogur y menta','Picante','Rúcula','Pimiento asado','In&out'].map(n=>[n,0])};
 const G_SIN={t:'¿Le sacamos algún vegetal?',multi:1,ops:['lechuga','repollo','tomate','cebolla','zanahoria','pepino','perejil'].map(v=>['Sin '+v,0])};
@@ -409,7 +409,7 @@ function badge(p){const v=vigentes();if(v.some(x=>x.tipo==='2x1'&&x.pid===p.id))
 function resumen(){const c=calc(cart,st.medio),envio=costoEnvio(c.tot,st.tipo);
  return{...c,envio,total:c.tot+envio,faltaMin:st.tipo==='delivery'&&c.tot<S.local.minimo,faltaGratis:st.tipo==='delivery'&&c.tot<S.local.envioGratis?S.local.envioGratis-c.tot:0}}
 function topVendidos(){const t={};S.movs.filter(m=>m.tipo==='venta').forEach(m=>(m.items||[]).forEach(i=>t[i.pid]=(t[i.pid]||0)+i.qty));
- return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(x=>P(x[0])).filter(p=>p&&p.cat!=='Bebidas').slice(0,6)}
+ return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(x=>P(x[0])).filter(p=>p&&!p.oculto&&p.cat!=='Bebidas').slice(0,6)}
 function cierreActual(){const h=getDH().hora,r=S.local.horarios.find(([a,b])=>h>=a&&h<b);return r?(r[1]==='24:00'?'00:00':r[1]):null}
 const pedidoActivo=()=>{const p=st.trackId&&S.pedidos.find(x=>x.id===st.trackId);return p&&p.estado!=='entregado'?p:null};
 
@@ -458,19 +458,19 @@ function promoCards(){let i=0;return vigentes().filter(x=>x.tipo!=='medio').map(
  if(x.tipo==='combo'){const full=x.pids.reduce((a,id)=>a+P(id).precio,0),off=Math.round((1-x.precio/full)*100);
   return `<div class="pcard" style="--i:${i++}" onclick="abrirCombo('${x.id}',this)">${ph('combo','',900,506)}<span class="bdg">−${off}%</span><span class="when">${when}</span></div>
    <div class="pb"><h4>${esc(x.nombre)}</h4><p>${x.pids.map(id=>P(id).nombre).join(' + ')}</p><div class="pr">${money(x.precio)}<s>${money(full)}</s></div></div></div>`}
- if(x.tipo==='2x1'){const p=P(x.pid);if(!p)return '';
+ if(x.tipo==='2x1'){const p=P(x.pid);if(!p||p.oculto)return '';
   return `<div class="pcard" style="--i:${i++}" onclick="abrirProd('${p.id}',this,2)">${ph(p.id,'',900,506)}<span class="bdg">2x1</span><span class="when">${when}</span></div>
    <div class="pb"><h4>${esc(x.nombre)}</h4><p>${esc(p.nombre)}: llevás 2 y pagás 1.</p><div class="pr">2 por ${money(p.precio)}<s>${money(p.precio*2)}</s></div></div></div>`}
- const [k,v]=x.alcance.split(':'),ps=k==='cat'?S.productos.filter(p=>p.cat===v):[P(v)];const p=ps[0];if(!p)return '';
+ const [k,v]=x.alcance.split(':'),ps=(k==='cat'?S.productos.filter(p=>p.cat===v):[P(v)]).filter(p=>p&&!p.oculto);const p=ps[0];if(!p)return '';
  return `<div class="pcard" style="--i:${i++}" onclick="${k==='cat'?`irA('c${CATS.indexOf(v)}')`:`abrirProd('${v}',this)`}">${ph(p.id,'',900,506)}<span class="bdg">−${x.pct}%</span><span class="when">${when}</span></div>
   <div class="pb"><h4>${esc(x.nombre)}</h4><p>${k==='cat'?`Todas las ${v.toLowerCase()} con ${x.pct}% de descuento.`:`${esc(p.nombre)} con ${x.pct}% off.`}</p><div class="pr">Desde ${money(Math.min(...ps.map(p=>p.precio))*(1-x.pct/100))}</div></div></div>`}).join('')}
 function renderSecciones(){const q=st.q.trim().toLowerCase(),el=document.getElementById('secciones');if(!el)return;
- if(q){const l=S.productos.filter(p=>(p.nombre+' '+p.desc+' '+p.cat).toLowerCase().includes(q));
-  el.innerHTML=`<section class="cat"><div class="sh"><h2>Resultados</h2><span>${l.length} para “${esc(st.q)}”</span></div>${l.length?`<div class="grid">${l.map(card).join('')}</div>`:'<div class="empty">No encontramos platos con esa búsqueda 🤔</div>'}</section>`;return}
+ if(q){const l=S.productos.filter(p=>!p.oculto&&(p.nombre+' '+p.desc+' '+p.cat).toLowerCase().includes(q));
+  el.innerHTML=`<section class="cat"><div class="sh"><h2>Resultados</h2><span>${l.length} para “${esc(st.q)}”</span></div>${l.length?`<div class="grid">${l.map((p,i)=>card(p,i)).join('')}</div>`:'<div class="empty">No encontramos platos con esa búsqueda 🤔</div>'}</section>`;return}
  const pc=promoCards(),top=topVendidos();
  el.innerHTML=(pc?`<section class="cat" id="sec-promos"><div class="sh"><h2>Promociones</h2><span>Vigentes ahora</span></div><div class="promo-grid">${pc}</div></section>`:'')+
   (top.length?`<section class="cat" id="sec-top"><div class="sh"><h2>🔥 Los más pedidos</h2><span>Lo que más sale hoy</span></div><div class="carousel">${top.map((p,i)=>card(p,i,`<span class="rank">#${i+1}</span>`)).join('')}</div></section>`:'')+
-  CATS.map((c,ci)=>{const l=S.productos.filter(p=>p.cat===c);return l.length?`<section class="cat" id="sec-c${ci}"><div class="sh"><h2>${c}</h2><span>${l.length} opciones</span></div><div class="grid">${l.map(card).join('')}</div></section>`:''}).join('');
+  CATS.map((c,ci)=>{const l=S.productos.filter(p=>p.cat===c&&!p.oculto);return l.length?`<section class="cat" id="sec-c${ci}"><div class="sh"><h2>${c}</h2><span>${l.length} opciones</span></div><div class="grid">${l.map((p,i)=>card(p,i)).join('')}</div></section>`:''}).join('');
  spy()}
 function irA(k){const el=document.getElementById('sec-'+k);if(el){st.q='';el.scrollIntoView({behavior:'smooth'})}else if(st.q){st.q='';document.querySelector('.search input').value='';renderSecciones();setTimeout(()=>irA(k),50)}}
 let spyObs=null;

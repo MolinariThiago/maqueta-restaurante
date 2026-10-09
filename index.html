@@ -83,6 +83,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 label.f{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:12px}
 label.f>input,label.f>select,label.f>textarea{margin-top:5px;color:var(--ink);font-weight:400}
 .search{max-width:260px}
+.pin{display:flex;align-items:center;gap:4px;justify-content:flex-end}.pin input{width:110px;text-align:right}
+tr.oculto td{opacity:.5}
 .tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:3px;flex-wrap:wrap}
 .tabs button{border:0;background:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:600;color:var(--muted);font-size:13px}
 .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
@@ -171,6 +173,65 @@ label.f>input,label.f>select,label.f>textarea{margin-top:5px;color:var(--ink);fo
 .chip{display:inline-block;background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:1px 7px;font-size:12px;margin:2px 3px 2px 0}
 .msgprev{white-space:pre-wrap;background:#e7f6ec;border-radius:12px;padding:14px;font-size:13.5px;border:1px solid #c8e8d3}
 @media (max-width:1200px){.g6{grid-template-columns:repeat(3,1fr)}.kan{grid-template-columns:repeat(2,1fr)}}
+/* responsive: tablet y celular */
+.burger{display:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.burger svg{width:20px;height:20px}
+.side-ov{display:none}
+.card{overflow-x:auto}
+@media (max-width:1000px){
+ .app{grid-template-columns:1fr;height:100dvh}
+ .side{position:fixed;inset:0 auto 0 0;width:260px;z-index:40;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto}
+ body.nav-open .side{transform:none;box-shadow:0 0 40px rgba(0,0,0,.35)}
+ body.nav-open .side-ov{display:block;position:fixed;inset:0;background:rgba(30,24,20,.45);z-index:35}
+ .burger{display:inline-flex}
+ .top{padding:12px 16px;gap:10px;flex-wrap:wrap}
+ .top h1{font-size:20px}
+ .content{padding:16px 16px 48px}
+ .g4,.g6{grid-template-columns:repeat(2,1fr)}
+ .g3{grid-template-columns:repeat(2,1fr)}
+ .grid[style*="grid-template-columns"]{grid-template-columns:1fr!important}
+ .g4>[style*="span"]{grid-column:1/-1!important}
+ .ed-body{grid-template-columns:1fr}
+ .menu-grid{max-height:40vh}
+ .ticket{max-height:none}
+ table{min-width:620px}
+ .search{max-width:none;flex:1;min-width:160px}
+}
+@media (max-width:640px){
+ .top .sp{display:none}
+ .top h1{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .top .pill{font-size:11.5px;padding:4px 10px}
+ .g2,.g3{grid-template-columns:1fr}
+ .kan{grid-template-columns:1fr}
+ .mesas{grid-template-columns:repeat(2,1fr);gap:10px}
+ .mesa{min-height:104px;padding:12px}
+ .mesa .n{font-size:18px;gap:6px}
+ .mesa .n .badge{font-size:10.5px;padding:2px 7px}
+ .kpi b{font-size:19px}
+ .card{padding:14px}
+ .toolbar>*{flex:1 1 auto}
+ .toolbar .sp{display:none}
+ .toolbar .card.row{width:100%}
+ .menu-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+ .hbar{grid-template-columns:90px 1fr 80px}
+ .ov{padding:0;align-items:flex-end}
+ .modal,.modal.mid,.modal.wide{width:100%;max-height:94dvh;border-radius:18px 18px 0 0}
+ .mh{padding:14px 16px}.mb{padding:16px}
+ .mf{padding:12px 16px;flex-wrap:wrap;border-radius:0}
+ .mf .btn{flex:1 1 auto;justify-content:center}
+ .toasts{left:12px;right:12px;bottom:12px}
+ .toast{min-width:0;max-width:none}
+ .legend{flex-wrap:wrap;gap:10px}
+ table.carta{min-width:0}
+ table.carta tr:first-child{display:none}
+ table.carta tr{display:grid;grid-template-columns:1fr 1fr auto;gap:6px 10px;padding:12px 0;border-bottom:1px solid #f0e8dc;align-items:end}
+ table.carta td{padding:0;border:0}
+ table.carta td:first-child{grid-column:1/-1}
+ table.carta td[data-l]:before{content:attr(data-l);display:block;font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px;text-align:left}
+ table.carta .pin input{width:100%}
+ table.carta td:last-child{grid-column:1/-1}
+ table.carta td:last-child .btn{width:100%;justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -189,6 +250,7 @@ label.f>input,label.f>select,label.f>textarea{margin-top:5px;color:var(--ink);fo
   </aside>
   <div class="main">
     <header class="top">
+      <button class="burger" aria-label="Abrir menú" onclick="document.body.classList.toggle('nav-open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <h1 id="title">Inicio</h1>
       <div class="sp"></div>
       <span class="pill" id="clock" onclick="go('promos')"></span>
@@ -197,6 +259,7 @@ label.f>input,label.f>select,label.f>textarea{margin-top:5px;color:var(--ink);fo
     <div class="content" id="view"></div>
   </div>
 </div>
+<div class="side-ov" onclick="document.body.classList.remove('nav-open')"></div>
 <div class="ov" id="ov" onmousedown="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
 <div class="toasts" id="toasts"></div>
 
@@ -213,9 +276,10 @@ const ICONS={
  caja:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>',
  stock:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
  prov:'<path d="M3 17V6h11v11M14 9h4l3 4v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
- promos:'<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>'
+ promos:'<path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+ carta:'<path d="M5 3h11l3 3v15H5z"/><path d="M9 9h6M9 13h6M9 17h4"/>'
 };
-const NAV=[['inicio','Inicio'],['salon','Salón'],['pedidos','Pedidos online'],['caja','Caja'],['stock','Stock'],['prov','Proveedores'],['promos','Promociones']];
+const NAV=[['inicio','Inicio'],['salon','Salón'],['pedidos','Pedidos online'],['caja','Caja'],['carta','Carta y precios'],['stock','Stock'],['prov','Proveedores'],['promos','Promociones']];
 
 function resetDemo(){if(confirm('¿Reiniciar la demo? Se borran los cambios y vuelven los datos de ejemplo.')){S=seed();save();load();closeModal();render();toast('Demo reiniciada','ok')}}
 HOOKS.lowStock=i=>setTimeout(()=>toast(`⚠ Stock bajo: ${i.nombre} (${fq(i.stock)} ${i.unidad}). Se sumó a pedidos sugeridos.`,'warn',()=>go('prov')),400);
@@ -238,7 +302,7 @@ function openModal(title,body,foot='',size=''){document.getElementById('modal').
  document.getElementById('ov').classList.add('show')}
 function closeModal(){document.getElementById('ov').classList.remove('show')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-function go(v){S.view=v;save();render();document.querySelector('.main').scrollTop=0}
+function go(v){document.body.classList.remove('nav-open');S.view=v;save();render();document.querySelector('.main').scrollTop=0}
 
 function render(){
  const low=S.insumos.filter(i=>i.stock<i.min).length,nuevos=S.pedidos.filter(p=>p.estado==='nuevo').length,cuentas=S.mesas.filter(m=>m.estado==='cuenta').length;
@@ -536,6 +600,59 @@ const saldoProvId=id=>saldoProv(PROV(id));
 function confirmarPago(){const pid=val('pp-p'),m=+val('pp-m'),med=val('pp-med'),p=PROV(pid);if(!(m>0))return toast('Monto inválido','err');
  p.cta.push({ts:Date.now(),tipo:'pago',detalle:med,monto:m});S.movs.unshift({id:uid(),ts:Date.now(),tipo:'pago_prov',concepto:`Pago a ${p.nombre}`,monto:m,medio:med,provId:pid});
  save();closeModal();render();toast(`Pago de ${money(m)} a ${p.nombre} registrado`,'ok')}
+
+/* ---------- CARTA Y PRECIOS ---------- */
+let cartaCat='Todas',cartaQ='';
+VIEWS.carta=()=>{
+ const list=S.productos.filter(p=>(cartaCat==='Todas'||p.cat===cartaCat)&&(!cartaQ||(p.nombre+' '+p.desc).toLowerCase().includes(cartaQ.toLowerCase())));
+ const ocultos=S.productos.filter(p=>p.oculto).length;
+ return `<div class="grid g4" style="margin-bottom:16px"><div class="kpi"><span>Productos</span><b>${S.productos.length}</b><small>en la carta</small></div>
+  <div class="kpi"><span>Visibles en la tienda</span><b>${S.productos.length-ocultos}</b><small>${ocultos?ocultos+' ocultos':'todos publicados'}</small></div>
+  <div class="kpi"><span>Con precio tachado</span><b>${S.productos.filter(p=>p.antes).length}</b><small>muestran descuento</small></div>
+  <div class="kpi"><span>Categorías</span><b>${CATS.length}</b><small>secciones del menú</small></div></div>
+ <div class="toolbar"><select style="width:auto" onchange="cartaCat=this.value;render()">${['Todas',...CATS].map(c=>`<option ${c===cartaCat?'selected':''}>${c}</option>`).join('')}</select>
+  <input type="text" class="search" id="carta-q" placeholder="Buscar producto…" value="${esc(cartaQ)}" oninput="cartaQ=this.value;clearTimeout(window._q);window._q=setTimeout(()=>{render();const e=document.getElementById('carta-q');e.focus();e.setSelectionRange(99,99)},250)">
+  <div class="sp"></div><button class="btn" onclick="ajusteMasivo()">Aumento masivo %</button><button class="btn pri" onclick="editarProd()">+ Producto</button></div>
+ <div class="card"><table class="carta"><tr><th>Producto</th><th class="num">Precio</th><th class="num">Precio tachado</th><th style="text-align:center">En tienda</th><th></th></tr>
+ ${list.map(p=>`<tr class="${p.oculto?'oculto':''}"><td><b>${esc(p.nombre)}</b><div class="muted" style="font-size:12px">${esc(p.cat)}${p.desc?' · '+esc(p.desc.length>70?p.desc.slice(0,70)+'…':p.desc):''}</div></td>
+  <td data-l="Precio"><div class="pin">$<input type="number" min="0" step="100" value="${p.precio}" onchange="setPrecio('${p.id}','precio',this)"></div></td>
+  <td data-l="Tachado"><div class="pin">$<input type="number" min="0" step="100" value="${p.antes||''}" placeholder="—" onchange="setPrecio('${p.id}','antes',this)"></div></td>
+  <td data-l="En tienda" style="text-align:center"><label class="sw" style="display:inline-block"><input type="checkbox" ${p.oculto?'':'checked'} onchange="setVisible('${p.id}',this.checked)"><span></span></label></td>
+  <td class="num"><button class="btn sm" onclick="editarProd('${p.id}')">Editar</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Sin resultados</td></tr>'}</table></div>
+ <p class="muted" style="margin-top:16px">Los cambios se publican al instante en la tienda online. Probá cambiar un precio con la tienda abierta en otra pestaña. El precio tachado es opcional: si lo completás, la tienda muestra el descuento.</p>`;
+};
+function setPrecio(id,campo,el){const p=P(id),v=el.value===''?null:Math.round(+el.value);
+ if(campo==='precio'&&!(v>0)){el.value=p.precio;return toast('El precio tiene que ser mayor a 0','err')}
+ if(campo==='antes'&&v!=null&&v<=p.precio){el.value=p.antes||'';return toast('El precio tachado tiene que ser mayor al precio actual','err')}
+ p[campo]=v;if(campo==='precio'&&p.antes&&p.antes<=v)p.antes=null;save();render();toast(`${esc(p.nombre)}: ${campo==='precio'?'precio actualizado a '+money(v):v?'precio tachado '+money(v):'sin precio tachado'}`,'ok')}
+function setVisible(id,on){const p=P(id);p.oculto=!on;save();render();toast(on?`${esc(p.nombre)} visible en la tienda`:`${esc(p.nombre)} oculto en la tienda`)}
+function editarProd(id){const p=id?P(id):{nombre:'',cat:cartaCat==='Todas'?CATS[0]:cartaCat,precio:'',antes:null,desc:''};
+ openModal(id?'Editar producto':'Nuevo producto',`<label class="f">Nombre<input type="text" id="ep-n" value="${esc(p.nombre)}" placeholder="Ej: Kebab mixto"></label>
+  <div class="grid g3"><label class="f">Categoría<select id="ep-c">${CATS.map(c=>`<option ${c===p.cat?'selected':''}>${c}</option>`).join('')}</select></label>
+  <label class="f">Precio<input type="number" id="ep-p" min="0" step="100" value="${p.precio}"></label>
+  <label class="f">Precio tachado (opcional)<input type="number" id="ep-a" min="0" step="100" value="${p.antes||''}"></label></div>
+  <label class="f">Descripción<textarea id="ep-d" rows="3" placeholder="Lo que ve el cliente en la tienda">${esc(p.desc)}</textarea></label>
+  ${id?'':'<p class="muted">La receta (insumos que descuenta del stock) se carga después. Sin receta, el producto se vende sin descontar insumos.</p>'}`,
+  `${id?`<button class="btn danger" onclick="borrarProd('${id}')">Eliminar</button><span class="sp" style="flex:1"></span>`:''}<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn pri" onclick="guardarProd(${id?`'${id}'`:''})">${id?'Guardar':'Crear producto'}</button>`,'mid')}
+function guardarProd(id){const n=val('ep-n').trim(),pr=Math.round(+val('ep-p')),an=val('ep-a')===''?null:Math.round(+val('ep-a'));
+ if(!n)return toast('Ingresá un nombre','err');if(!(pr>0))return toast('Ingresá un precio válido','err');
+ if(an!=null&&an<=pr)return toast('El precio tachado tiene que ser mayor al precio','err');
+ const d={nombre:n,cat:val('ep-c'),precio:pr,antes:an,desc:val('ep-d').trim()};
+ if(id)Object.assign(P(id),d);else S.productos.push({id:uid(),receta:[],...d});
+ save();closeModal();render();toast(id?'Producto actualizado':'Producto creado y publicado en la tienda','ok')}
+function borrarProd(id){const p=P(id);
+ const usado=S.mesas.some(m=>m.items.some(i=>i.pid===id))||S.pedidos.some(x=>x.items.some(i=>i.pid===id))||S.movs.some(m=>(m.items||[]).some(i=>i.pid===id))||S.promos.some(x=>x.pid===id||(x.pids||[]).includes(id)||x.alcance==='pid:'+id);
+ if(usado)return toast('Este producto tiene ventas, pedidos o promociones asociadas. Ocultalo de la tienda en lugar de eliminarlo.','err');
+ if(!confirm(`¿Eliminar "${p.nombre}"?`))return;S.productos=S.productos.filter(x=>x.id!==id);save();closeModal();render();toast('Producto eliminado')}
+function ajusteMasivo(){openModal('Aumento masivo de precios',`<div class="grid g2"><label class="f">Porcentaje (negativo para bajar)<input type="number" id="am-p" value="10" step="1"></label>
+  <label class="f">Aplica a<select id="am-c">${['Todas',...CATS].map(c=>`<option ${c===cartaCat?'selected':''}>${c}</option>`).join('')}</select></label></div>
+  <label class="f">Redondear a<select id="am-r"><option value="100">$100</option><option value="500">$500</option><option value="1">Sin redondeo</option></select></label>
+  <p class="muted">Sirve para actualizar la carta por inflación en un solo paso. Los precios tachados también se ajustan.</p>`,
+  `<button class="btn" onclick="closeModal()">Cancelar</button><button class="btn pri" onclick="aplicarMasivo()">Aplicar</button>`)}
+function aplicarMasivo(){const pct=+val('am-p'),c=val('am-c'),r=+val('am-r');if(!pct||pct<=-100)return toast('Porcentaje inválido','err');
+ const ps=S.productos.filter(p=>c==='Todas'||p.cat===c),f=x=>Math.max(r,Math.round(x*(1+pct/100)/r)*r);
+ if(!confirm(`¿${pct>0?'Aumentar':'Bajar'} ${Math.abs(pct)}% el precio de ${ps.length} productos${c==='Todas'?'':' de '+c}?`))return;
+ ps.forEach(p=>{p.precio=f(p.precio);if(p.antes){const a=f(p.antes);p.antes=a>p.precio?a:null}});save();closeModal();render();toast(`✓ ${ps.length} precios actualizados (${pct>0?'+':''}${pct}%)`,'ok')}
 
 /* ---------- PROMOCIONES ---------- */
 const TIPO_P={pct:['%','Descuento %'],'2x1':['2x1','2x1'],combo:['CMB','Combo'],medio:['$','Por medio de pago']};
